@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 定义日志的根级别，通常是INFO, DEBUG, WARN, ERROR -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <!-- 定义控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 定义文件输出 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/myapp.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>logs/archived/myapp-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+
+            <!-- 保留天数 -->
+            <maxHistory>30</maxHistory>
+
+            <!-- 日志文件大小限制，超过这个大小就会创建新的日志文件 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 为Spring框架的日志设置特定的配置 -->
+    <logger name="org.springframework" level="INFO">
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!-- 为Elasticsearch客户端的日志设置特定的配置 -->
+    <logger name="org.elasticsearch" level="WARN">
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!-- 为应用程序的日志设置特定的配置 -->
+    <logger name="com.xcrms" level="DEBUG">
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!-- 排除不需要日志的包或类 -->
+    <logger name="org.apache.commons.beanutils" level="ERROR" />
+
+    <!-- Spring Boot Actuator 的日志配置 -->
+    <logger name="org.springframework.boot.autoconfigure.logging.ConditionEvaluationDebugLogger" level="INFO" />
+
+</configuration>
