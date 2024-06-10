@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class Aggregation {
+public class AggregationOps {
 
 
     @Autowired

@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class Document {
+public class DocumentOps {
 
 
     @Autowired

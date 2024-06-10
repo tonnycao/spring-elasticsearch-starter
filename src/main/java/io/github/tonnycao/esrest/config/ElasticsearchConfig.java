@@ -28,7 +28,7 @@ public class ElasticsearchConfig {
     private ElasticsearchProperties properties;
 
     @Bean
-    public RestHighLevelClient createClient() {
+    public RestHighLevelClient restHighLevelClient() {
 
         RestHighLevelClient client = null;
 

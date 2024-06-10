@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public class IndexTemplate {
+public class IndexTemplateOps {
 
     @Autowired
     private RestHighLevelClient client;
