@@ -1,6 +1,8 @@
 package io.github.tonnycao.esrest.index;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
+import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -8,12 +10,14 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.plaf.basic.BasicIconFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +55,7 @@ public class IndexOps {
     }
 
     /***
-     * 根据名称确定索引是否存在
+     * check index name exist
      * @param name
      * @return
      * @throws IOException
@@ -113,5 +117,81 @@ public class IndexOps {
         request.type("_doc").source(jsonMap);
         AcknowledgedResponse putMappingResponse = client.indices().putMapping(request, RequestOptions.DEFAULT);
         return putMappingResponse.isAcknowledged();
+    }
+
+    /***
+     * add index names alias to aliasName
+     * @param indexNames
+     * @param aliasName
+     * @param routing
+     * @param termFilter
+     * @return
+     * @throws IOException
+     */
+    public Boolean addAlias(String[] indexNames, String aliasName, String routing, Map<String, Object>termFilter) throws IOException {
+        IndicesAliasesRequest.AliasActions addIndicesAction =
+                new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.ADD)
+                        .indices(indexNames)
+                        .alias(aliasName);
+
+        if(null != routing){
+            addIndicesAction.routing(routing);
+        }
+
+        if(null != termFilter){
+            addIndicesAction.filter(JSONObject.toJSONString(termFilter));
+        }
+
+        IndicesAliasesRequest request = new IndicesAliasesRequest();
+        request.addAliasAction(addIndicesAction);
+        AcknowledgedResponse indicesAliasesResponse = client.indices().updateAliases(request, RequestOptions.DEFAULT);
+        return indicesAliasesResponse.isAcknowledged();
+
+    }
+
+    /***
+     * remove index Names from aliasName
+     * @param indexNames
+     * @param aliasName
+     * @param routing
+     * @param termFilter
+     * @return
+     * @throws IOException
+     */
+    public Boolean removeAlias(String[] indexNames, String aliasName, String routing, Map<String, Object>termFilter) throws IOException {
+        IndicesAliasesRequest.AliasActions addIndicesAction =
+                new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.REMOVE)
+                        .indices(indexNames)
+                        .alias(aliasName);
+
+        if(null != routing){
+            addIndicesAction.routing(routing);
+        }
+
+        if(null != termFilter){
+            addIndicesAction.filter(JSONObject.toJSONString(termFilter));
+        }
+
+        IndicesAliasesRequest request = new IndicesAliasesRequest();
+        request.addAliasAction(addIndicesAction);
+        AcknowledgedResponse indicesAliasesResponse = client.indices().updateAliases(request, RequestOptions.DEFAULT);
+        return indicesAliasesResponse.isAcknowledged();
+
+    }
+
+    /***
+     * check index exists Alias
+     * @param index
+     * @param alias
+     * @return
+     * @throws IOException
+     */
+    public Boolean existsAlias(String[] index, String alias) throws IOException {
+        GetAliasesRequest request = new GetAliasesRequest();
+        request.indices(index);
+        request.aliases(alias);
+        request.indicesOptions(IndicesOptions.lenientExpandOpen());
+        request.local(true);
+        return  client.indices().existsAlias(request, RequestOptions.DEFAULT);
     }
 }

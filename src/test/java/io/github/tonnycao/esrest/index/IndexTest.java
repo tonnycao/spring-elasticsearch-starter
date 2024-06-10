@@ -61,4 +61,13 @@ class IndexTest {
 
         assertThat(result).isEqualTo(true);
     }
+
+    @Test
+    void addAlias() throws IOException {
+        String name = "test_index";
+        String alias  = "test";
+        String[] names = {"test_index"};
+        Boolean result = indexOps.existsAlias(names, alias);
+        assertThat(result).isEqualTo(false);
+    }
 }
