@@ -11,8 +11,6 @@ import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,7 +63,7 @@ public class IndexOps {
     }
 
     /***
-     * query  one index by name
+     * query one index by name
      * @param name
      * @return
      * @throws IOException
@@ -78,7 +76,7 @@ public class IndexOps {
     }
 
     /***
-     * set index Mapping
+     * create index with Mapping and Setting
      * @param name
      * @param properties
      * @return
@@ -99,4 +97,21 @@ public class IndexOps {
         return response.isAcknowledged();
     }
 
+    /***
+     * update index Mapping
+     * @param name
+     * @param properties
+     * @return
+     * @throws IOException
+     */
+    public Boolean updateMapping(String name, Map<String, Map<String, Object>> properties) throws IOException {
+        PutMappingRequest request = new PutMappingRequest(name);
+        Map<String, Object> jsonMap = new HashMap<>();
+        {
+            jsonMap.put("properties", properties);
+        }
+        request.type("_doc").source(jsonMap);
+        AcknowledgedResponse putMappingResponse = client.indices().putMapping(request, RequestOptions.DEFAULT);
+        return putMappingResponse.isAcknowledged();
+    }
 }

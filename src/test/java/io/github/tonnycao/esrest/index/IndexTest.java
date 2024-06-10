@@ -53,7 +53,11 @@ class IndexTest {
         message.put("type", "text");
         properties.put("message", message);
 
-        Boolean result = indexOps.create(name, properties, s);
+        Map<String, Object> user = new HashMap<>();
+        user.put("type", "text");
+        properties.put("user", user);
+
+        Boolean result = indexOps.updateMapping(name, properties);
 
         assertThat(result).isEqualTo(true);
     }
