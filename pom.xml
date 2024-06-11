@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.github.tonnycao</groupId>
 	<artifactId>esrest</artifactId>
-	<version>0.0.1-RELEASE</version>
+	<version>0.0.2-RELEASE</version>
 	<name>elasticsearch</name>
 	<description>elasticsearch-rest-high-level-client for Spring Boot</description>
 	<url>https://github.com/tonnycao/spring-elasticsearch-starter</url>

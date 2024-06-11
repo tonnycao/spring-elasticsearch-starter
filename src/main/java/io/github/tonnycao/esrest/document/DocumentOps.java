@@ -27,12 +27,14 @@ import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@Service
 public class DocumentOps {
 
 
@@ -46,7 +48,7 @@ public class DocumentOps {
      * @return
      * @throws IOException
      */
-    public void addDoc(String name, Map<String, Object> jsonMap) throws IOException {
+    public Boolean addDoc(String name, Map<String, Object> jsonMap) throws IOException {
         IndexRequest request = new IndexRequest(name);
         request.type("_doc");
         if(null != jsonMap.get("id")){
@@ -59,7 +61,7 @@ public class DocumentOps {
 
         IndexResponse response = client.index(request, RequestOptions.DEFAULT);
         log.info("{}", JSONObject.toJSONString(response));
-
+        return response.getResult() == DocWriteResponse.Result.CREATED;
     }
 
     /***

@@ -15,12 +15,14 @@ import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.SuggestBuilders;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@Service
 public class SearchOps {
 
     @Autowired
@@ -198,4 +200,6 @@ public class SearchOps {
 
         return searchMap;
     }
+
+
 }
