@@ -12,26 +12,17 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -137,58 +128,6 @@ public class DocumentOps {
     }
 
     /***
-     * query by one  filed
-     * @param index
-     * @param field
-     * @param value
-     * @param size
-     * @param from
-     * @param orderBy sort field
-     * @param order desc or asc
-     * @return
-     * @throws IOException
-     */
-    public Map<String, Object> queryTerm(String index, String field, String value, Integer size, Integer from,
-                                         String orderBy, String order, String unmappedType) throws IOException {
-        SearchRequest searchRequest = new SearchRequest(index);
-        searchRequest.types("_doc");
-        searchRequest.indices(index);
-
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        if(null != field && null != value){
-            MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(field, value);
-            searchSourceBuilder.query(matchQueryBuilder);
-        }
-
-        searchSourceBuilder.from(from);
-        searchSourceBuilder.size(size);
-        if(null == orderBy){
-            orderBy = "id";
-        }
-
-        searchSourceBuilder.fetchSource(true);
-        if(null != order && null != orderBy){
-            searchSourceBuilder.sort(new FieldSortBuilder(orderBy).order(SortOrder.fromString(order)).unmappedType(unmappedType));
-        }
-        searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
-        searchRequest.source(searchSourceBuilder);
-        searchRequest.indices(index);
-        SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-        Map<String, Object> searchMap = new HashMap<>();
-        Long total = response.getHits().getTotalHits().value;
-        List<Map<String, Object>> items = new ArrayList<>(response.getHits().getHits().length);
-        Arrays.asList(response.getHits().getHits()).forEach(item -> {
-            items.add(item.getSourceAsMap());
-        });
-        searchMap.put("total", total);
-        searchMap.put("totalPage", Math.ceil(total/size));
-        searchMap.put("from", from);
-        searchMap.put("items", items);
-
-        return searchMap;
-    }
-
-    /***
      * update one doc by id
      * @param indexName
      * @param id
@@ -208,38 +147,5 @@ public class DocumentOps {
                 request, RequestOptions.DEFAULT);
 
         return updateResponse.getResult() == DocWriteResponse.Result.UPDATED;
-    }
-
-    /***
-     * 搜索分页
-     * @param request
-     * @param from
-     * @param size
-     * @return
-     */
-    public Map<String, Object> search(SearchRequest request, Integer from, Integer size){
-        Map<String, Object> searchMap = new HashMap<>();
-
-        try {
-            SearchResponse response = null;
-            response = client.search(request, RequestOptions.DEFAULT);
-
-            List<Map<String, Object>> items = new ArrayList<>();
-
-            for (SearchHit his: response.getHits().getHits()) {
-                items.add(his.getSourceAsMap());
-            }
-
-            Long total = response.getHits().getTotalHits().value;
-            Double totalPage = Math.ceil(Double.valueOf(total)/size);
-
-            searchMap.put("total", total);
-            searchMap.put("totalPage", (int)Math.round(totalPage));
-            searchMap.put("from", from);
-            searchMap.put("items", items);
-        } catch (IOException e) {
-            log.error("es search error: {}", e.getMessage());
-        }
-        return searchMap;
     }
 }
