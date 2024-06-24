@@ -1,6 +1,9 @@
 package io.github.tonnycao.esrest.index;
 
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesResponse;
 import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
@@ -9,6 +12,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexTemplatesRequest;
 import org.elasticsearch.client.indices.IndexTemplatesExistRequest;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +37,7 @@ public class IndexTemplateOps {
      * @throws IOException
      */
     public Boolean create(String name, List<String> patterns,
-                                    Map<String, Map<String, Object>> properties, Map<String, Object> setting) throws IOException {
+                                    Map<String, Map<String, Object>> properties, Map<String, Object> setting, String aliasName) throws IOException {
 
         PutIndexTemplateRequest request = new PutIndexTemplateRequest(name);
         request.patterns(patterns);
@@ -49,11 +53,29 @@ public class IndexTemplateOps {
 
         request.mapping("_doc", jsonMap);
         request.settings(setting);
-
+        if(StrUtil.isNotBlank(aliasName)){
+            request.alias(new Alias(aliasName));
+        }
         AcknowledgedResponse response = client.indices().putTemplate(request, RequestOptions.DEFAULT);
         return response.isAcknowledged();
     }
 
+    /***
+     * create by json
+     * @param name
+     * @param jsonStr
+     * @return
+     * @throws IOException
+     */
+    public Boolean createByJson(String name, String jsonStr) throws IOException {
+
+        PutIndexTemplateRequest request = new PutIndexTemplateRequest(name);
+        request.source(jsonStr, XContentType.JSON);
+        request.create(true);
+        request.order(20);
+        AcknowledgedResponse response = client.indices().putTemplate(request, RequestOptions.DEFAULT);
+        return response.isAcknowledged();
+    }
 
     /**
      * existing check
