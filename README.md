@@ -12,7 +12,7 @@ Index and Index Template create, update, delete, query
 term, match, fuzzy, range, wildcard, bool.
 
 ### Aggregation  for ES aggregation OPS
-metric, bucket
+metric, bucket.
 
 ### Advance for ES advanced OPS
 Advance OPS like snapshot, task, script and so on.
