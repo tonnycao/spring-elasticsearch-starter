@@ -3,7 +3,7 @@
 ## components
 
 ###  Document for ES document OPS
-Document create, add, update, delete, query
+Document create, add, update, delete, query.
 
 ###  Index for ES index OPS
 Index and Index Template create, update, delete, query.
