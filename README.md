@@ -6,7 +6,7 @@
 Document create, add, update, delete, query
 
 ###  Index for ES index OPS
-Index and Index Template create, update, delete, query
+Index and Index Template create, update, delete, query.
 
 ### Search for ES query OPS
 term, match, fuzzy, range, wildcard, bool.
